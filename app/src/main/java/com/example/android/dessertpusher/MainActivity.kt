@@ -28,10 +28,9 @@ import androidx.lifecycle.LifecycleObserver
 import com.example.android.dessertpusher.databinding.ActivityMainBinding
 import timber.log.Timber
 
-/** onSaveInstanceState Bundle Keys **/
-const val KEY_REVENUE = "revenue_key"
-const val KEY_DESSERT_SOLD = "dessert_sold_key"
-const val KEY_TIMER_SECONDS = "timer_seconds_key"
+const val KEY_REVENU = "key_revenu"
+const val KEY_SOLD = "key_sold"
+const val KEY_TIMER = "key_timer"
 
 class MainActivity : AppCompatActivity(), LifecycleObserver {
 
@@ -83,15 +82,12 @@ class MainActivity : AppCompatActivity(), LifecycleObserver {
         // Setup dessertTimer, passing in the lifecycle
         dessertTimer = DessertTimer(this.lifecycle)
 
-        // If there is a savedInstanceState bundle, then you're "restarting" the activity
-        // If there isn't a bundle, then it's a "fresh" start
-        if (savedInstanceState != null) {
-            // Get all the game state information from the bundle, set it
-            revenue = savedInstanceState.getInt(KEY_REVENUE, 0)
-            dessertsSold = savedInstanceState.getInt(KEY_DESSERT_SOLD, 0)
-            dessertTimer.secondsCount = savedInstanceState.getInt(KEY_TIMER_SECONDS, 0)
-            showCurrentDessert()
-
+        // three values you saved and restore them: revenue, desserts sold and the timer's
+        // seconds count. Also make sure to show the correct image resource.
+        if (savedInstanceState != null){
+            revenue = savedInstanceState.getInt(KEY_REVENU)
+            dessertsSold = savedInstanceState.getInt(KEY_SOLD)
+            dessertTimer.secondsCount = savedInstanceState.getInt(KEY_TIMER)
         }
 
         // Set the TextViews to the right values
@@ -169,20 +165,23 @@ class MainActivity : AppCompatActivity(), LifecycleObserver {
         return super.onOptionsItemSelected(item)
     }
 
-    /**
-     * Called when the user navigates away from the app but might come back
-     */
-    override fun onSaveInstanceState(outState: Bundle) {
-        outState.putInt(KEY_REVENUE, revenue)
-        outState.putInt(KEY_DESSERT_SOLD, dessertsSold)
-        outState.putInt(KEY_TIMER_SECONDS, dessertTimer.secondsCount)
-        Timber.i("onSaveInstanceState Called")
+
+    override fun onSaveInstanceState(outState: Bundle?) {
         super.onSaveInstanceState(outState)
+        Timber.i("onSave called")
+        outState?.putInt(KEY_REVENU,revenue)
+        outState?.putInt(KEY_SOLD,dessertsSold)
+        outState?.putInt(KEY_TIMER,dessertTimer.secondsCount)
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle?) {
         super.onRestoreInstanceState(savedInstanceState)
-        Timber.i("onRestoreInstanceState Called")
+        Timber.i("onRestore called")
+        if (savedInstanceState != null){
+            revenue = savedInstanceState.getInt(KEY_REVENU)
+            dessertsSold = savedInstanceState.getInt(KEY_SOLD)
+            dessertTimer.secondsCount = savedInstanceState.getInt(KEY_TIMER)
+        }
     }
 
     /** Lifecycle Methods **/
